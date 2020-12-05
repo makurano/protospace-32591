@@ -1,5 +1,6 @@
 class PrototypesController < ApplicationController
   before_action :authenticate_user!, except: :index
+  before_action :prevent_edit, only: [:edit, :update]
   def index
     @prototypes = Prototype.all
     # binding.pry
@@ -22,8 +23,27 @@ class PrototypesController < ApplicationController
     @prototype = Prototype.find(params[:id])
   end
 
+  def edit
+    @prototype = Prototype.find(params[:id])
+  end
+
+  def update
+    prototype = Prototype.find(params[:id])
+    if prototype.update(prototype_params)
+      redirect_to prototype_path(params[:id])
+    else
+      render :edit
+    end
+  end
+
 private
   def prototype_params
     params.require(:prototype).permit(:title, :catch_copy, :concept, :image).merge(user_id: current_user.id)
+  end
+
+  def prevent_edit
+    unless Prototype.find(params[:id]).user_id == current_user.id
+      redirect_to action: :show  
+    end
   end
 end
