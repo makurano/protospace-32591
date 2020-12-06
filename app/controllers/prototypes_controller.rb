@@ -1,8 +1,9 @@
 class PrototypesController < ApplicationController
-  before_action :authenticate_user!, except: :index
+  before_action :authenticate_user!, except: [:index, :show]
   before_action :prevent_edit, only: [:edit, :update, :destroy]
+
   def index
-    @prototypes = Prototype.all
+    @prototypes = Prototype.includes(:user)
     # binding.pry
   end
   
@@ -21,6 +22,8 @@ class PrototypesController < ApplicationController
 
   def show
     @prototype = Prototype.find(params[:id])
+    @comment = Comment.new
+    @comments = @prototype.comments.includes(:user)
   end
 
   def edit
@@ -52,7 +55,7 @@ class PrototypesController < ApplicationController
 
   def prevent_edit
     unless Prototype.find(params[:id]).user_id == current_user.id
-      redirect_to action: :show  
+      redirect_to action: :index
     end
   end
 
