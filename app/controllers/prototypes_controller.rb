@@ -2,7 +2,7 @@ class PrototypesController < ApplicationController
   before_action :authenticate_user!, except: :index
   before_action :prevent_edit, only: [:edit, :update, :destroy]
   def index
-    @prototypes = Prototype.all
+    @prototypes = Prototype.includes(:user)
     # binding.pry
   end
   
